@@ -4136,35 +4136,54 @@ Public Class frmAdhocSync
                             'End If
                             Select Case Globale.CodAzi
                                 Case "COPTG"
-                                    If _ord.ODPARIVA.ToString.Trim <> "" Then
-                                        _ord.ODCODCLI = Me.getCodeByPIvaCf(_ord.ODPARIVA, _ord.ODCODFIS)
-                                        If _ord.ODCODCLI = "" Or _ord.ODCODCLI.StartsWith("w") Or _ord.ODCODCLI.StartsWith("t") Then
-                                            _ord.ODCODCLI = Me.getOrInsertCust(_ord.OD_EMAIL)
-                                        End If
-                                        _codcli = _ord.ODCODCLI
-                                        _parMast.caucon = ""
-                                        Dim hPagamen As New Hashtable
-                                        Dim hConti As Hashtable = adhoc.readAdhocTable("CONTI", "ANTIPCON,ANCODICE", "C" & "," & _codcli, False)
-                                        Dim _codpag As String = CTran(CType(hConti("ANCODPAG"), s_tableValue).mValue, "")
-                                        hPagamen = adhoc.readAdhocTable("PAG_AMEN", "PACODICE", _codpag, False)
-                                        _parMast.speinc = adhoc.getVal(hPagamen("PASPEINC"))
-                                    Else
-                                        'Cliente privato
-                                        _ord.ODCODCLI = ""
-                                        _codcli = ""
-                                        _clipriv = hCliPriv(_ord.OD_EMAIL.ToString.Trim)
-                                        _despriv = hDesPriv(_ord.OD_EMAIL.ToString.Trim)
-                                        With _parMast
-                                            .nomepriv = _clipriv.CognomeNome.ToString.PadRight(40, " ")
-                                            .indiripriv = IIf(IsNothing(_despriv), _clipriv.Indirizzo, _despriv.Indirizzo).ToString.PadRight(35, " ")
-                                            .cappriv = IIf(IsNothing(_despriv), _clipriv.Cap, _despriv.Cap).ToString.PadRight(8, " ")
-                                            .localipriv = IIf(IsNothing(_despriv), _clipriv.locali, _despriv.locali).ToString.PadRight(30, " ")
-                                            .provinpriv = IIf(IsNothing(_despriv), _clipriv.provin, _despriv.provin).ToString.PadRight(2, " ")
-                                            .codfiscpriv = _clipriv.codfis.ToString.PadRight(16, " ")
-                                            .codpag = _clipriv.codpag
-                                        End With
-                                        _parMast.caucon = adhoc.getVal(htipdocu("TDCAUCON"))
+                                    '18-03-2021 Per copt i privati vengono trattati come i clienti con p.iva
+                                    _parMast.tipcon = "C"
+                                    _parMast.cladoc = "OV"
+                                    _parMast.spetra = _ord.ODSPETRA
+                                    '
+                                    _ord.ODCODCLI = Me.getCodeByPIvaCf(_ord.ODPARIVA, _ord.ODCODFIS)
+                                    If _ord.ODCODCLI = "" Or _ord.ODCODCLI.StartsWith("w") Or _ord.ODCODCLI.StartsWith("t") Then
+                                        _ord.ODCODCLI = Me.getOrInsertCust(_ord.OD_EMAIL)
                                     End If
+                                    _codcli = _ord.ODCODCLI
+                                    _parMast.caucon = ""
+                                    Dim hPagamen As New Hashtable
+                                    Dim hConti As Hashtable = adhoc.readAdhocTable("CONTI", "ANTIPCON,ANCODICE", "C" & "," & _codcli, False)
+                                    Dim _codpag As String = CTran(CType(hConti("ANCODPAG"), s_tableValue).mValue, "")
+                                    hPagamen = adhoc.readAdhocTable("PAG_AMEN", "PACODICE", _codpag, False)
+                                    _parMast.speinc = adhoc.getVal(hPagamen("PASPEINC"))
+                                    If 1 = 0 Then
+                                        If _ord.ODPARIVA.ToString.Trim <> "" Then
+                                            _ord.ODCODCLI = Me.getCodeByPIvaCf(_ord.ODPARIVA, _ord.ODCODFIS)
+                                            If _ord.ODCODCLI = "" Or _ord.ODCODCLI.StartsWith("w") Or _ord.ODCODCLI.StartsWith("t") Then
+                                                _ord.ODCODCLI = Me.getOrInsertCust(_ord.OD_EMAIL)
+                                            End If
+                                            _codcli = _ord.ODCODCLI
+                                            _parMast.caucon = ""
+                                            'Dim hPagamen As New Hashtable
+                                            'Dim hConti As Hashtable = adhoc.readAdhocTable("CONTI", "ANTIPCON,ANCODICE", "C" & "," & _codcli, False)
+                                            'Dim _codpag As String = CTran(CType(hConti("ANCODPAG"), s_tableValue).mValue, "")
+                                            'hPagamen = adhoc.readAdhocTable("PAG_AMEN", "PACODICE", _codpag, False)
+                                            '_parMast.speinc = adhoc.getVal(hPagamen("PASPEINC"))
+                                        Else
+                                            'Cliente privato
+                                            _ord.ODCODCLI = ""
+                                            _codcli = ""
+                                            _clipriv = hCliPriv(_ord.OD_EMAIL.ToString.Trim)
+                                            _despriv = hDesPriv(_ord.OD_EMAIL.ToString.Trim)
+                                            With _parMast
+                                                .nomepriv = _clipriv.CognomeNome.ToString.PadRight(40, " ")
+                                                .indiripriv = IIf(IsNothing(_despriv), _clipriv.Indirizzo, _despriv.Indirizzo).ToString.PadRight(35, " ")
+                                                .cappriv = IIf(IsNothing(_despriv), _clipriv.Cap, _despriv.Cap).ToString.PadRight(8, " ")
+                                                .localipriv = IIf(IsNothing(_despriv), _clipriv.locali, _despriv.locali).ToString.PadRight(30, " ")
+                                                .provinpriv = IIf(IsNothing(_despriv), _clipriv.provin, _despriv.provin).ToString.PadRight(2, " ")
+                                                .codfiscpriv = _clipriv.codfis.ToString.PadRight(16, " ")
+                                                .codpag = _clipriv.codpag
+                                            End With
+                                            _parMast.caucon = adhoc.getVal(htipdocu("TDCAUCON"))
+                                        End If
+                                    End If
+
                                 Case "ALTRQ"
                                     If _ord.ODCODCLI = "" Or _ord.ODCODCLI.StartsWith("w") Or _ord.ODCODCLI.StartsWith("t") Then
                                         _ord.ODCODCLI = Me.getCodeByPIvaCf(_ord.ODPARIVA, _ord.ODCODFIS)
@@ -5032,7 +5051,8 @@ Public Class frmAdhocSync
                             .codpag = CTran(ppar.ANCODPAG, "")
                         End With
                         hCliPriv.Add(ppar.AN_EMAIL.Trim, clipriv)
-                        Continue For
+                        '18-03-2021 prendo ugualmente i dati anhe per il privato ma elimino il Continue per proseguire per inserire l' anagrafica anche di questi 
+                        'Continue For
                     End If
                     '
                     ppar.ANCODICE = Me.getCodeByPIvaCf(ppar.ANPARIVA, ppar.ANCODFIS)
@@ -5054,6 +5074,10 @@ Public Class frmAdhocSync
                         adhoc.hFieldVal.Add("UTNUMCEL", op.ValAdapter(ppar.ANNUMCEL, TipoCampo.TChar))
                         adhoc.hFieldVal.Add("UTPARIVA", op.ValAdapter(ppar.ANPARIVA, TipoCampo.TChar))
                         adhoc.hFieldVal.Add("UTCODFIS", op.ValAdapter(ppar.ANCODFIS, TipoCampo.TChar))
+                        If ppar.ANPARIVA = "" Then
+                            'L' utente privato è autorizzato subito
+                            adhoc.hFieldVal.Add("UTAUTORI", op.ValAdapter("S", TipoCampo.TChar))
+                        End If
                         '
                         Dim strsql As String = "select ut_email from " & adhoc.getTablename("ASYSUTEWEB") & " where ut_email = " & op.ValAdapter(ppar.AN_EMAIL, TipoCampo.TChar)
                         Dim ds As DataSet = op.esegui_query(strsql)
@@ -5070,7 +5094,8 @@ Public Class frmAdhocSync
                         lstUpd.Items.Add(ppar.AN_EMAIL)
                         lstUpd.Refresh()
                         '
-                        'ppar.ANCODICE = Me.getOrInsertCust(ppar.AN_EMAIL) Il cliente nuovo va inserito solo se arriva l' ordine.
+                        '18-03-2021 ripristinato l' inserimento perchè COPT ha iniziato a vendere ai privati.
+                        ppar.ANCODICE = Me.getOrInsertCust(ppar.AN_EMAIL)
                     Else
                         Me.updateClienti(ppar.ANCODICE)
                     End If
