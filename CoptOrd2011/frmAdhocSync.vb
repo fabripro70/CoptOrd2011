@@ -3807,7 +3807,8 @@ Public Class frmAdhocSync
                                 gk_Ord.Add(_ord.ODNUMORD & "-" & _ord.ODCODART & "_" & gIndexOrdStr.Trim)
                                 '
                                 'This row (transportation charge) come be addded only if this is a private customer order
-                                If Not _bspese And _ord.ODPARIVA.Trim = "" Then
+                                '31-03-2021 Questo lo tolgo pechè le spese di trasporto vengono indicate nella testata del documento
+                                If Not _bspese And _ord.ODPARIVA.Trim = "" And 1 = 0 Then
                                     _ord.ODTIPRIG = "F"
                                     _ord.ODCODART = "SPESE DI TRASPORTO"
                                     _ord.ODQTAMOV = 1
