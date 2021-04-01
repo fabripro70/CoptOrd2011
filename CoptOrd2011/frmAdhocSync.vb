@@ -3867,7 +3867,10 @@ Public Class frmAdhocSync
                                         End Select
                                     End With
                                 Next
-                                gCli.Add(gIndexCli.ToString.Trim, _cli)
+                                Dim _email As String = element.ChildNodes.Item(10).InnerText.Trim()
+                                If _email <> "##AN_EMAIL##" Then  'Contenuto non corretto, scarto il record
+                                    gCli.Add(gIndexCli.ToString.Trim, _cli)
+                                End If
                                 gIndexCli += 1
                             Case "DES_DIVE"
                                 For Each _field As XmlNode In element.ChildNodes
