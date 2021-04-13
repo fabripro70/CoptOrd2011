@@ -5099,7 +5099,9 @@ Public Class frmAdhocSync
                         lstUpd.Refresh()
                         '
                         '18-03-2021 ripristinato l' inserimento perchè COPT ha iniziato a vendere ai privati.
-                        ppar.ANCODICE = Me.getOrInsertCust(ppar.AN_EMAIL)
+                        If ppar.ANPARIVA = "" Then
+                            ppar.ANCODICE = Me.getOrInsertCust(ppar.AN_EMAIL)
+                        End If
                     Else
                         Me.updateClienti(ppar.ANCODICE)
                     End If
