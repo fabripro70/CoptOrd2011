@@ -299,6 +299,9 @@ Public Class frmAdhocSync
                 Case "DUMPVENDUTO"
                     _g_auto = True
                     ExportVendutoMensile()
+                Case "DUMPVENDUTOSTO"
+                    _g_auto = True
+                    ExportVendutoMensileStorico()
                 Case "DUMPLISTINIAGENTI"
                     _g_auto = True
                     ExportListiniFullAgenti()
@@ -644,6 +647,250 @@ Public Class frmAdhocSync
                     Dim resultQuery As String = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
                     filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
                     filewriter.Flush()
+                Next
+                filewriter.Close()
+                '
+                'Prepara script
+                '
+                Me.WriteLog("Preparazione script WinScp" & " - ExportListiniFull")
+                '
+                Dim hScriptFile As New FileStream("script.txt", FileMode.Create)
+                Try
+                    'hScriptFile = File.Open("script.txt", FileMode.Append)
+                    Dim lByteMess As Byte()
+                    '
+
+                    'Dim lMessage As String = "open ftp://" & pUser & ":" & pPasswd & "@" & pHost & " -timeout=240" & Constants.vbCrLf & _
+                    '                         "put " & "xml/" & pLocalPath.TrimEnd("\") & "\*.*" & Constants.vbCrLf & _
+                    '                         "exit" & Constants.vbCrLf
+                    'Questa sintassi mi trasferisce solo il contenuto della cartella e non delle sotto cartelle
+                    '
+                    Dim lMessage As String = "open ftp://" & _site.user & ":" & _site.password & "@" & _site.host & " -timeout=240" & Constants.vbCrLf &
+                                             "put -filemask=""*.sql|*/"" " & "xml/" & _site.seq.TrimEnd("\") & "\*.sql" & Constants.vbCrLf &
+                                             "exit" & Constants.vbCrLf
+                    lByteMess = System.Text.Encoding.ASCII.GetBytes(lMessage)
+                    hScriptFile.Write(lByteMess, 0, lMessage.Length)
+                    '
+                Catch ex As Exception
+                    Me.WriteLog(ex.Message & " - ExportVendutoMensile")
+                Finally
+                    hScriptFile.Close()
+                    hScriptFile = Nothing
+                End Try
+                '
+                'Export ftp
+                '
+                Me.WriteLog("Export file via ftp" & " - ExportVendutoMensile")
+                '
+                Try
+                    '
+                    Me.WriteLog("Upload files " & " - CallWinScp")
+                    '
+                    Dim _taskInfo As New ProcessStartInfo
+                    Dim _ds As New Diagnostics.Process
+                    '
+                    'WinScp\winscp.exe /log=ftp.log /script=script.txt
+                    _taskInfo.FileName = "WinScp\winscp.exe"
+                    _taskInfo.Arguments = "/log=ftp.log /script=script.txt"
+                    _taskInfo.WindowStyle = ProcessWindowStyle.Hidden
+                    _ds = Process.Start(_taskInfo)
+                    'wait for end process
+                    While Not _ds.HasExited
+                    End While
+                    Dim a As String = _ds.ExitCode
+                    '
+                Catch ex As System.Exception
+                    Me.WriteLog(ex.Message & " - Export file via ftp")
+                    wRunning = False
+                End Try
+                '
+                'Sposta files
+                '
+                Dim _folder As String = "Xml\" & _site.seq.TrimEnd("\")
+                Dim _Movefolder As String = "Xml\" & _site.seq.TrimEnd("\") & "\esportati"
+                Dim di As New DirectoryInfo(_folder)
+                Dim fi As FileInfo
+                Me.WriteLog("Move all files " & " - MoveFtpFiles")
+
+                Try
+                    If Not System.IO.Directory.Exists(_Movefolder) Then
+                        System.IO.Directory.CreateDirectory(_Movefolder)
+                    End If
+                    '
+                    For Each fi In di.GetFiles()
+                        Try
+                            If IO.File.Exists(_Movefolder.TrimEnd & "\" & fi.Name) Then
+                                IO.File.Delete(_Movefolder.TrimEnd & "\" & fi.Name)
+                            End If
+                            IO.File.Move(_folder.TrimEnd & "\" & fi.Name, _Movefolder.TrimEnd & "\" & fi.Name)
+                        Catch ex As Exception
+
+                        End Try
+                    Next
+                Catch ex As System.IO.IOException
+                    Me.WriteLog(ex.Message & " - MoveFtpFiles")
+                Catch ex As SystemException
+                    Me.WriteLog(ex.Message & " - MoveFtpFiles")
+                    Return False
+                Finally
+                    di = Nothing
+                    fi = Nothing
+                End Try
+                '
+            Next
+            Me.WriteLog("Dump listini completato!" & " - ExportVendutoMensile")
+            Application.Exit()
+        Catch ex As Exception
+            Me.WriteLog(ex.Message & " - ExportVendutoMensile")
+            Application.Exit()
+        End Try
+    End Function
+
+    Private Function ExportVendutoMensileStorico() As Boolean
+        Try
+
+
+            Dim _site As New sSite
+
+            gKsiteList.Sort()
+            For Each element As String In gKsiteList
+
+
+                Me.WriteLog("Inizio dump listini" & " - ExportVendutoMensile")
+
+                _site = gSiteList(element)
+
+
+                Dim sw As System.IO.FileStream
+
+                Dim _updFold As String = Globale.cartellaAggLocale.TrimEnd("\") & "\\" & _site.seq
+
+                If Not Directory.Exists(_updFold) Then
+                    Directory.CreateDirectory(_updFold)
+                End If
+                '
+
+                Dim testCodart As String = ""
+                Dim fileexp As String = _updFold & "\\expvendutostorico.sql"
+                '
+                sw = New System.IO.FileStream(fileexp, IO.FileMode.Create)
+                Dim filewriter As New System.IO.StreamWriter(sw)
+
+                Dim ds As DataSet = op.esegui_sp("sp_legge_vendite_adhoc_storico", cn)
+                For Each row As DataRow In ds.Tables(0).Rows
+
+                    '
+                    Dim Mese As Integer = Now.Month
+                    Dim MeseStr As String = Mese.ToString.PadLeft(2, "0")
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("01", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GEN").ToString.Trim, TipoCampo.TCur))
+                    Dim resultQuery As String = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("02", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("FEB").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("03", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("MAR").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("04", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("APR").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("05", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("MAG").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("06", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GIU").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("07", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("LUG").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("08", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("AGO").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("09", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("SETT").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("10", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("OTT").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("11", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("NOV").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", op.ValAdapter("12", TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("DIC").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
                 Next
                 filewriter.Close()
                 '
