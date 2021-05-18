@@ -256,6 +256,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="!README.TXT" />
+    <Content Include="StoredProcedure\sp_legge_vendite_adhoc.sql" />
+    <Content Include="StoredProcedure\sp_legge_vendite_adhoc_storico.sql" />
+    <Content Include="StoredProcedure\sp_vednuto_mensile.sql" />
+    <Content Include="Trigger\Trigger Altraq per aggiornare il sito_1.sql" />
+    <Content Include="Trigger\Trigger Copt per aggiornare gli agenti.sql" />
+    <Content Include="Trigger\Trigger Copt per aggiornare gli agenti_v1.sql" />
+    <Content Include="Trigger\Trigger Copt per aggiornare gli agenti_v2_tablet.sql" />
+    <Content Include="Trigger\Trigger Copt per aggiornare gli agenti_v2_tablet_partial.sql" />
+    <Content Include="Trigger\Trigger Copt per aggiornare il nuovo sito web - Copia.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
