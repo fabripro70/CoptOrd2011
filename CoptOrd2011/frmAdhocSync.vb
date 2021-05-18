@@ -607,16 +607,47 @@ Public Class frmAdhocSync
                 sw = New System.IO.FileStream(fileexp, IO.FileMode.Create)
                 Dim filewriter As New System.IO.StreamWriter(sw)
 
+                Dim Mese As Integer = Now.Month
+                'Dim Mese As Integer = 1
+                Dim MeseStr As String = Mese.ToString.PadLeft(2, "0")
+                'Dim MeseStr As String = "01"
+
                 Dim ds As DataSet = op.esegui_sp("sp_legge_vendite_adhoc", cn)
+
+                If ds.Tables(0).Rows.Count > 0 Then
+                    Dim Anno As String = ds.Tables(0).Rows(0).Item("ANNO").ToString.Trim
+                    Dim resultQuery = "DELETE FROM FATTURATO WHERE ANNO = " & op.ValAdapter(Anno, TipoCampo.TChar) & " AND MESE = " & op.ValAdapter(MeseStr, TipoCampo.TChar)
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                End If
+
                 For Each row As DataRow In ds.Tables(0).Rows
 
                     adhoc.hFieldVal.Clear()
                     '
-                    Dim Mese As Integer = Now.Month
-                    Dim MeseStr As String = Mese.ToString.PadLeft(2, "0")
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    Dim pariva As String = ""
+                    Dim codfis As String = ""
+
+                    'Aggiungere la lettura della p.iva o cf
+                    Dim strqry As String = String.Format("SELECT ANPARIVA, ANCODFIS FROM {0}CONTI WHERE ANTIPCON = 'C' AND ANCODICE = '{1}'", Globale.CodAzi, CTran(row("FBCLIENTE").ToString.Trim, ""))
+                    Dim dsCli As DataSet = op.esegui_query(strqry)
+                    If dsCli.Tables(0).Rows.Count > 0 Then
+
+                        pariva = CTran(dsCli.Tables(0).Rows(0).Item("ANPARIVA").ToString.Trim, "")
+                        codfis = CTran(dsCli.Tables(0).Rows(0).Item("ANCODFIS").ToString.Trim, "")
+
+                    End If
+                    Dim ANPIVACF As String = ""
+                    If pariva <> "" Then
+                        ANPIVACF = pariva
+                    Else
+                        ANPIVACF = codfis
+                    End If
+                    '
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter(MeseStr, TipoCampo.TChar))
+
                     Select Case Mese
                         Case 1
                             adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GEN").ToString.Trim, TipoCampo.TCur))
@@ -777,14 +808,40 @@ Public Class frmAdhocSync
                 Dim filewriter As New System.IO.StreamWriter(sw)
 
                 Dim ds As DataSet = op.esegui_sp("sp_legge_vendite_adhoc_storico", cn)
+                If ds.Tables(0).Rows.Count > 0 Then
+                    Dim Anno As String = ds.Tables(0).Rows(0).Item("ANNO").ToString.Trim
+                    Dim resultQuery = "DELETE FROM FATTURATO WHERE ANNO = " & op.ValAdapter(Anno, TipoCampo.TChar)
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                End If
                 For Each row As DataRow In ds.Tables(0).Rows
 
                     '
                     Dim Mese As Integer = Now.Month
+
+                    Dim pariva As String = ""
+                    Dim codfis As String = ""
+
                     Dim MeseStr As String = Mese.ToString.PadLeft(2, "0")
 
+                    'Aggiungere la lettura della p.iva o cf
+                    Dim strqry As String = String.Format("SELECT ANPARIVA, ANCODFIS FROM {0}CONTI WHERE ANTIPCON = 'C' AND ANCODICE = '{1}'", Globale.CodAzi, CTran(row("FBCLIENTE").ToString.Trim, ""))
+                    Dim dsCli As DataSet = op.esegui_query(strqry)
+                    If dsCli.Tables(0).Rows.Count > 0 Then
+
+                        pariva = CTran(dsCli.Tables(0).Rows(0).Item("ANPARIVA").ToString.Trim, "")
+                        codfis = CTran(dsCli.Tables(0).Rows(0).Item("ANCODFIS").ToString.Trim, "")
+
+                    End If
+                    Dim ANPIVACF As String = ""
+                    If pariva <> "" Then
+                        ANPIVACF = pariva
+                    Else
+                        ANPIVACF = codfis
+                    End If
+                    '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("01", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GEN").ToString.Trim, TipoCampo.TCur))
@@ -793,7 +850,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("02", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("FEB").ToString.Trim, TipoCampo.TCur))
@@ -802,7 +859,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("03", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("MAR").ToString.Trim, TipoCampo.TCur))
@@ -811,7 +868,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("04", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("APR").ToString.Trim, TipoCampo.TCur))
@@ -820,7 +877,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("05", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("MAG").ToString.Trim, TipoCampo.TCur))
@@ -829,7 +886,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("06", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GIU").ToString.Trim, TipoCampo.TCur))
@@ -838,7 +895,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("07", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("LUG").ToString.Trim, TipoCampo.TCur))
@@ -847,7 +904,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("08", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("AGO").ToString.Trim, TipoCampo.TCur))
@@ -856,7 +913,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("09", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("SETT").ToString.Trim, TipoCampo.TCur))
@@ -865,7 +922,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("10", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("OTT").ToString.Trim, TipoCampo.TCur))
@@ -874,7 +931,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("11", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("NOV").ToString.Trim, TipoCampo.TCur))
@@ -883,7 +940,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     '
                     adhoc.hFieldVal.Clear()
-                    adhoc.hFieldVal.Add("AN_EMAIL", op.ValAdapter(row("UT_EMAIL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("MESE", op.ValAdapter("12", TipoCampo.TChar))
                     adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("DIC").ToString.Trim, TipoCampo.TCur))
