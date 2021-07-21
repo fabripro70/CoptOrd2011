@@ -3152,7 +3152,8 @@ Public Class frmAdhocSync
                     Exit Sub
                 End If
                 '
-                ff.SetBinaryMode(False)
+                ff.SetBinaryMode(True)
+                '
                 Dim stringa As String() = ff.GetFileList("*.xml")
                 Dim ii As Integer
                 ProgressBar2in.Maximum = stringa.Length
@@ -4500,6 +4501,7 @@ Public Class frmAdhocSync
                                         MsgBox("Ordine : " & _ord.ODNUMORD & "; cliente sconosciuto, PIVA : " & _ord.ODPARIVA & " C.F. : " & _ord.ODCODFIS)
                                         Continue For
                                     End If
+                                    _parMast.caucon = ""
                             End Select
                             '
                             _parMast.ordweb = _ord.ODNUMORD
@@ -5003,7 +5005,7 @@ Public Class frmAdhocSync
             '
             '
             Dim hCaucon As New Hashtable
-            hCaucon = adhoc.readAdhocTable("CAU_CONT", "CCCODICE", ppar.caucon, False)
+            'hCaucon = adhoc.readAdhocTable("CAU_CONT", "CCCODICE", ppar.caucon, False)
             Dim _tipreg As String = CType(hCaucon("CCTIPREG"), s_tableValue).mValue
             '
             For Each _item As String In phItem.Keys
