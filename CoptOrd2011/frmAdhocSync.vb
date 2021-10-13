@@ -616,14 +616,13 @@ Public Class frmAdhocSync
 
                 If ds.Tables(0).Rows.Count > 0 Then
                     Dim Anno As String = ds.Tables(0).Rows(0).Item("ANNO").ToString.Trim
-                    Dim resultQuery = "DELETE FROM FATTURATO WHERE ANNO = " & op.ValAdapter(Anno, TipoCampo.TChar) & " AND MESE = " & op.ValAdapter(MeseStr, TipoCampo.TChar)
+                    Dim resultQuery = "DELETE FROM FATTURATO WHERE ANNO = " & op.ValAdapter(Anno, TipoCampo.TChar)
                     filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
                     filewriter.Flush()
                 End If
 
                 For Each row As DataRow In ds.Tables(0).Rows
 
-                    adhoc.hFieldVal.Clear()
                     '
                     Dim pariva As String = ""
                     Dim codfis As String = ""
@@ -644,40 +643,115 @@ Public Class frmAdhocSync
                         ANPIVACF = codfis
                     End If
                     '
+                    adhoc.hFieldVal.Clear()
                     adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
                     adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
-                    adhoc.hFieldVal.Add("MESE", op.ValAdapter(MeseStr, TipoCampo.TChar))
-
-                    Select Case Mese
-                        Case 1
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GEN").ToString.Trim, TipoCampo.TCur))
-                        Case 2
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("FEB").ToString.Trim, TipoCampo.TCur))
-                        Case 3
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("MAR").ToString.Trim, TipoCampo.TCur))
-                        Case 4
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("APR").ToString.Trim, TipoCampo.TCur))
-                        Case 5
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("MAG").ToString.Trim, TipoCampo.TCur))
-                        Case 6
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GIU").ToString.Trim, TipoCampo.TCur))
-                        Case 7
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("LUG").ToString.Trim, TipoCampo.TCur))
-                        Case 8
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("AGO").ToString.Trim, TipoCampo.TCur))
-                        Case 9
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("SETT").ToString.Trim, TipoCampo.TCur))
-                        Case 10
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("OTT").ToString.Trim, TipoCampo.TCur))
-                        Case 11
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("NOV").ToString.Trim, TipoCampo.TCur))
-                        Case 12
-                            adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("DIC").ToString.Trim, TipoCampo.TCur))
-                    End Select
-                    '
+                    adhoc.hFieldVal.Add("MESE", "01")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GEN").ToString.Trim, TipoCampo.TCur))
                     Dim resultQuery As String = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
                     filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
                     filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "02")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("FEB").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "03")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("MAR").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "04")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("APR").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "05")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("MAG").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "06")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("GIU").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "07")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("LUG").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "08")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("AGO").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "09")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("SETT").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "10")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("OTT").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "11")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("NOV").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ANPIVACF", op.ValAdapter(ANPIVACF, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ANNO", op.ValAdapter(row("ANNO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("MESE", "12")
+                    adhoc.hFieldVal.Add("TOTALE", op.ValAdapter(row("DIC").ToString.Trim, TipoCampo.TCur))
+                    resultQuery = op.CreateInsertQuery("FATTURATO", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+
+                    '
                 Next
                 filewriter.Close()
                 '
@@ -4385,14 +4459,26 @@ Public Class frmAdhocSync
     End Function
     Private Function getCodeByPIvaCf(ByVal pPiva As String, ByVal pCf As String) As String
         Try
-
+            Dim _conto As String = ""
             If pPiva.Trim <> "" And pPiva.Trim <> "NULL" Then
                 Dim hConti As Hashtable = adhoc.readAdhocTable("CONTI", "ANTIPCON,ANPARIVA", "C" & "," & pPiva, False)
-                Return CTran(adhoc.getVal(hConti("ANCODICE")), "")
-            ElseIf pCf.Trim <> "" And pCf.Trim <> "NULL" Then
-                Dim hConti As Hashtable = adhoc.readAdhocTable("CONTI", "ANTIPCON,ANCODFIS", "C" & "," & pCf, False)
-                Return CTran(adhoc.getVal(hConti("ANCODICE")), "")
+                Try
+                    _conto = CTran(adhoc.getVal(hConti("ANCODICE")), "")
+                Catch ex As Exception
+                    _conto = ""
+                End Try
             End If
+            If _conto = "" Then
+                If pCf.Trim <> "" And pCf.Trim <> "NULL" Then
+                    Dim hConti As Hashtable = adhoc.readAdhocTable("CONTI", "ANTIPCON,ANCODFIS", "C" & "," & pCf, False)
+                    Try
+                        _conto = CTran(adhoc.getVal(hConti("ANCODICE")), "")
+                    Catch ex As Exception
+                        _conto = ""
+                    End Try
+                End If
+            End If
+            Return _conto
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical, "getCodeByPIvaCf")
         End Try
