@@ -22,15 +22,11 @@ Partial Class frmFilter
     'Non modificarla nell'editor del codice.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle13 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle16 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle14 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle15 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.itemGrid = New System.Windows.Forms.DataGridView()
-        Me.Tipo = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Codice = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Descrizione = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Index = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.txtCodice = New System.Windows.Forms.TextBox()
         Me.txtDescrizione = New System.Windows.Forms.TextBox()
@@ -44,6 +40,16 @@ Partial Class frmFilter
         Me.txtIndex = New System.Windows.Forms.TextBox()
         Me.TxtIndexSite = New System.Windows.Forms.TextBox()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.Codice = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Descrizione = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Index = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Tipo = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Tabella = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Query = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.txTabella = New System.Windows.Forms.TextBox()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.txQuery = New System.Windows.Forms.TextBox()
         CType(Me.itemGrid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -57,55 +63,26 @@ Partial Class frmFilter
         Me.itemGrid.BackgroundColor = System.Drawing.Color.SteelBlue
         Me.itemGrid.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.itemGrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken
-        DataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle1.BackColor = System.Drawing.Color.LightCyan
-        DataGridViewCellStyle1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.itemGrid.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle13.BackColor = System.Drawing.Color.LightCyan
+        DataGridViewCellStyle13.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.itemGrid.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle13
         Me.itemGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.itemGrid.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Tipo, Me.Codice, Me.Descrizione, Me.Index})
+        Me.itemGrid.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Codice, Me.Descrizione, Me.Index, Me.Tipo, Me.Tabella, Me.Query})
         Me.itemGrid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnKeystroke
         Me.itemGrid.Location = New System.Drawing.Point(12, 92)
         Me.itemGrid.Name = "itemGrid"
         Me.itemGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
         Me.itemGrid.RowHeadersWidth = 4
-        DataGridViewCellStyle4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.itemGrid.RowsDefaultCellStyle = DataGridViewCellStyle4
-        Me.itemGrid.Size = New System.Drawing.Size(647, 313)
+        DataGridViewCellStyle16.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.itemGrid.RowsDefaultCellStyle = DataGridViewCellStyle16
+        Me.itemGrid.Size = New System.Drawing.Size(1022, 313)
         Me.itemGrid.TabIndex = 39
         Me.itemGrid.TabStop = False
-        '
-        'Tipo
-        '
-        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Tipo.DefaultCellStyle = DataGridViewCellStyle2
-        Me.Tipo.HeaderText = "Tipo"
-        Me.Tipo.Name = "Tipo"
-        Me.Tipo.Width = 150
-        '
-        'Codice
-        '
-        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
-        Me.Codice.DefaultCellStyle = DataGridViewCellStyle3
-        Me.Codice.HeaderText = "Codice"
-        Me.Codice.Name = "Codice"
-        Me.Codice.Width = 120
-        '
-        'Descrizione
-        '
-        Me.Descrizione.HeaderText = "Descrizione"
-        Me.Descrizione.Name = "Descrizione"
-        Me.Descrizione.Width = 380
-        '
-        'Index
-        '
-        Me.Index.HeaderText = "Index"
-        Me.Index.Name = "Index"
-        Me.Index.Visible = False
         '
         'Label5
         '
@@ -155,7 +132,7 @@ Partial Class frmFilter
         Me.cmbTipo.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cmbTipo.ForeColor = System.Drawing.Color.White
         Me.cmbTipo.FormattingEnabled = True
-        Me.cmbTipo.Items.AddRange(New Object() {"Articolo", "Gruppo merceologico", "Famiglia", "Tabella"})
+        Me.cmbTipo.Items.AddRange(New Object() {"Articolo", "Gruppo merceologico", "Famiglia", "Tabella", "Filtro", "Query"})
         Me.cmbTipo.Location = New System.Drawing.Point(12, 65)
         Me.cmbTipo.Name = "cmbTipo"
         Me.cmbTipo.Size = New System.Drawing.Size(164, 23)
@@ -240,12 +217,99 @@ Partial Class frmFilter
         Me.Label3.TabIndex = 50
         Me.Label3.Text = "Sequenza :"
         '
+        'Codice
+        '
+        DataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight
+        Me.Codice.DefaultCellStyle = DataGridViewCellStyle14
+        Me.Codice.HeaderText = "Codice"
+        Me.Codice.Name = "Codice"
+        Me.Codice.Width = 120
+        '
+        'Descrizione
+        '
+        Me.Descrizione.HeaderText = "Descrizione"
+        Me.Descrizione.Name = "Descrizione"
+        Me.Descrizione.Width = 380
+        '
+        'Index
+        '
+        Me.Index.HeaderText = "Index"
+        Me.Index.Name = "Index"
+        Me.Index.Visible = False
+        '
+        'Tipo
+        '
+        DataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle15.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Tipo.DefaultCellStyle = DataGridViewCellStyle15
+        Me.Tipo.HeaderText = "Tipo"
+        Me.Tipo.Name = "Tipo"
+        Me.Tipo.Width = 150
+        '
+        'Tabella
+        '
+        Me.Tabella.HeaderText = "Tabella"
+        Me.Tabella.Name = "Tabella"
+        Me.Tabella.Width = 150
+        '
+        'Query
+        '
+        Me.Query.HeaderText = "Query"
+        Me.Query.Name = "Query"
+        Me.Query.Width = 200
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.ForeColor = System.Drawing.Color.Yellow
+        Me.Label4.Location = New System.Drawing.Point(665, 47)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(48, 15)
+        Me.Label4.TabIndex = 52
+        Me.Label4.Text = "Tabella"
+        '
+        'txTabella
+        '
+        Me.txTabella.BackColor = System.Drawing.Color.SteelBlue
+        Me.txTabella.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txTabella.ForeColor = System.Drawing.Color.White
+        Me.txTabella.Location = New System.Drawing.Point(665, 65)
+        Me.txTabella.Name = "txTabella"
+        Me.txTabella.Size = New System.Drawing.Size(153, 21)
+        Me.txTabella.TabIndex = 51
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label6.ForeColor = System.Drawing.Color.Yellow
+        Me.Label6.Location = New System.Drawing.Point(824, 47)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(69, 15)
+        Me.Label6.TabIndex = 54
+        Me.Label6.Text = "Query/Filtro"
+        '
+        'txQuery
+        '
+        Me.txQuery.BackColor = System.Drawing.Color.SteelBlue
+        Me.txQuery.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.txQuery.ForeColor = System.Drawing.Color.White
+        Me.txQuery.Location = New System.Drawing.Point(824, 65)
+        Me.txQuery.Name = "txQuery"
+        Me.txQuery.Size = New System.Drawing.Size(190, 21)
+        Me.txQuery.TabIndex = 53
+        '
         'frmFilter
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.SteelBlue
-        Me.ClientSize = New System.Drawing.Size(672, 446)
+        Me.ClientSize = New System.Drawing.Size(1117, 446)
+        Me.Controls.Add(Me.Label6)
+        Me.Controls.Add(Me.txQuery)
+        Me.Controls.Add(Me.Label4)
+        Me.Controls.Add(Me.txTabella)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.TxtIndexSite)
         Me.Controls.Add(Me.txtIndex)
@@ -280,10 +344,16 @@ Partial Class frmFilter
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents lbSito As System.Windows.Forms.Label
     Friend WithEvents txtIndex As System.Windows.Forms.TextBox
-    Friend WithEvents Tipo As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Codice As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Descrizione As System.Windows.Forms.DataGridViewTextBoxColumn
-    Friend WithEvents Index As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents TxtIndexSite As System.Windows.Forms.TextBox
     Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents Codice As DataGridViewTextBoxColumn
+    Friend WithEvents Descrizione As DataGridViewTextBoxColumn
+    Friend WithEvents Index As DataGridViewTextBoxColumn
+    Friend WithEvents Tipo As DataGridViewTextBoxColumn
+    Friend WithEvents Tabella As DataGridViewTextBoxColumn
+    Friend WithEvents Query As DataGridViewTextBoxColumn
+    Friend WithEvents Label4 As Label
+    Friend WithEvents txTabella As TextBox
+    Friend WithEvents Label6 As Label
+    Friend WithEvents txQuery As TextBox
 End Class

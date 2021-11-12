@@ -203,6 +203,8 @@ Public Class frmAdhocSync
         Dim desc As String
         Dim type As String
         Dim indexSite As String
+        Dim Tabella As String
+        Dim Query As String
     End Structure
     Private Structure sClipriv
         Dim CognomeNome As String
@@ -221,6 +223,15 @@ Public Class frmAdhocSync
         Dim provin As String
         Dim codfis As String
     End Structure
+    Private Structure sCriterio
+        Dim Tabella As String
+        Dim Filtro As String
+    End Structure
+    Private Structure sQuery
+        Dim Tabella As String
+        Dim Query As String
+    End Structure
+
     Public _Container As New Hashtable ' Contains a list of Manifest entity for each table
     Dim _query As String
     Dim _hOperat As New Hashtable
@@ -249,6 +260,8 @@ Public Class frmAdhocSync
     Dim gFilter As New sFilter
     Dim gItemsFilter As New ArrayList  'Contains items to upload, if empty uploads all items.
     Dim gTableFilter As New ArrayList 'Contains tables name to upload, if empty it will upload all tables.
+    Dim gCriteri As New ArrayList 'Contiene ulteriori ulteriori filtri in strile sql da accodare alla query di ricerca, va riempito con tipo dato sCriterio
+    Dim gQuery As New ArrayList 'Contiene la query che deve sostituire quella specificata nel manifest, va riempito con tipo dato sQuery
     Dim gFldProp As New Hashtable 'Contains field's properties values 
     Dim gBodyMail As String = ""
     Dim gBsuccess As Boolean = False
@@ -296,6 +309,9 @@ Public Class frmAdhocSync
         If My.Application.CommandLineArgs.Count > 0 Then
             Dim a As String = My.Application.CommandLineArgs.Item(0)
             Select Case a.ToUpper
+                Case "DUMPARTICOLIORREA"
+                    _g_auto = True
+                    ExportArticoliOrreaFull()
                 Case "DUMPVENDUTO"
                     _g_auto = True
                     ExportVendutoMensile()
@@ -458,6 +474,8 @@ Public Class frmAdhocSync
 
             gItemsFilter = New ArrayList
             gTableFilter = New ArrayList
+            gCriteri = New ArrayList
+            gQuery = New ArrayList
             XmlLeggi.WhitespaceHandling = WhitespaceHandling.None
 
             Xmlfile.Load(XmlLeggi)
@@ -481,6 +499,10 @@ Public Class frmAdhocSync
                             gFilter.desc = value
                         Case "type"
                             gFilter.type = value
+                        Case "tabella"
+                            gFilter.Tabella = value
+                        Case "query"
+                            gFilter.Query = value
                     End Select
                 Next
                 If gFilter.site.Trim <> pSite.host.ToString.Trim Then
@@ -504,7 +526,17 @@ Public Class frmAdhocSync
                         Next
                         ds.Dispose()
                     Case "Tabella"
-                        gTableFilter.Add(gFilter.item)
+                        gTableFilter.Add(gFilter.Tabella)
+                    Case "Filtro"
+                        Dim _criterio As New sCriterio
+                        _criterio.Tabella = gFilter.Tabella
+                        _criterio.Filtro = gFilter.Query
+                        gCriteri.Add(_criterio)
+                    Case "Query"
+                        Dim _query As New sQuery
+                        _query.Tabella = gFilter.Tabella
+                        _query.query = gFilter.Query
+                        gQuery.Add(_query)
                 End Select
             Next
             Xmlfile = New XmlDocument
@@ -1120,7 +1152,167 @@ Public Class frmAdhocSync
             Application.Exit()
         End Try
     End Function
+    Private Function ExportArticoliOrreaFull() As Boolean
+        Try
 
+            Dim _site As New sSite
+
+            gKsiteList.Sort()
+            For Each element As String In gKsiteList
+
+
+                Me.WriteLog("Inizio dump Articoli" & " - ExportArticoliOrreaFull")
+
+                _site = gSiteList(element)
+
+
+                Dim sw As System.IO.FileStream
+
+                Dim _updFold As String = Globale.cartellaAggLocale.TrimEnd("\") & "\\" & _site.seq
+
+                If Not Directory.Exists(_updFold) Then
+                    Directory.CreateDirectory(_updFold)
+                End If
+                '
+                Dim testCodart As String = ""
+                Dim fileexp As String = _updFold & "\\exparticoli_orrea.sql"
+                '
+                sw = New System.IO.FileStream(fileexp, IO.FileMode.Create)
+                Dim filewriter As New System.IO.StreamWriter(sw)
+                '
+                'Con_tram
+                '
+                '
+                Dim deleteQuery As String = "delete from ARTICOLI;" & Chr(13) & Chr(10)
+                filewriter.Write(deleteQuery)
+                filewriter.Flush()
+                '
+                Dim sqlQuery As String = op.getQuery(Globale.CodAzi, "articoli_orrea.vqr")
+
+                Dim ds As DataSet = op.esegui_query(sqlQuery)
+                For Each row As DataRow In ds.Tables(0).Rows
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ARCODART", op.ValAdapter(row("ARCODART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARDESART", op.ValAdapter(row("ARDESART").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("ARUNMIS1", op.ValAdapter(row("ARUNMIS1").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARMOLTIP", op.ValAdapter(row("ARMOLTIP").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("AROPERAT", op.ValAdapter(row("AROPERAT").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARUNMIS2", op.ValAdapter(row("ARUNMIS2").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARGRUMER", op.ValAdapter(row("ARGRUMER").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("ARCODFAM", op.ValAdapter(row("ARCODFAM").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("AR___IMG", op.ValAdapter(row("AR___IMG").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARDTOBSO", op.ValAdapter(row("ARDTOBSO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARDESSUP", op.ValAdapter(row("ARDESSUP").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARPUBBLICA", op.ValAdapter(row("ARPUBBLICA").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARLOTVEN", op.ValAdapter(row("ARLOTVEN").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARCODMAR", op.ValAdapter(row("ARCODMAR").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARCODSEZ", op.ValAdapter(row("ARCODSEZ").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARSCHEDA", op.ValAdapter(row("ARSCHEDA").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARCODIVA", op.ValAdapter(row("ARCODIVA").ToString.Trim, TipoCampo.TChar))
+
+                    Dim resultQuery As String = op.CreateInsertQuery("ARTICOLI", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                Next
+                filewriter.Close()
+                '
+                'Prepara script
+                '
+                Me.WriteLog("Preparazione script WinScp" & " - ExportArticoliOrreaFull")
+                '
+                Dim hScriptFile As New FileStream("script.txt", FileMode.Create)
+                Try
+                    'hScriptFile = File.Open("script.txt", FileMode.Append)
+                    Dim lByteMess As Byte()
+                    '
+
+                    'Dim lMessage As String = "open ftp://" & pUser & ":" & pPasswd & "@" & pHost & " -timeout=240" & Constants.vbCrLf & _
+                    '                         "put " & "xml/" & pLocalPath.TrimEnd("\") & "\*.*" & Constants.vbCrLf & _
+                    '                         "exit" & Constants.vbCrLf
+                    'Questa sintassi mi trasferisce solo il contenuto della cartella e non delle sotto cartelle
+                    '
+                    Dim lMessage As String = "open ftp://" & _site.user & ":" & _site.password & "@" & _site.host & " -timeout=240" & Constants.vbCrLf &
+                                             "put -filemask=""*.sql|*/"" " & "xml/" & _site.seq.TrimEnd("\") & "\*.sql" & Constants.vbCrLf &
+                                             "exit" & Constants.vbCrLf
+                    lByteMess = System.Text.Encoding.ASCII.GetBytes(lMessage)
+                    hScriptFile.Write(lByteMess, 0, lMessage.Length)
+                    '
+                Catch ex As Exception
+                    Me.WriteLog(ex.Message & " - ExportArticoliOrreaFull")
+                Finally
+                    hScriptFile.Close()
+                    hScriptFile = Nothing
+                End Try
+                '
+                'Export ftp
+                '
+                Me.WriteLog("Export file via ftp" & " - ExportArticoliOrrea")
+                '
+                Try
+                    '
+                    Me.WriteLog("Upload files " & " - CallWinScp")
+                    '
+                    Dim _taskInfo As New ProcessStartInfo
+                    Dim _ds As New Diagnostics.Process
+                    '
+                    'WinScp\winscp.exe /log=ftp.log /script=script.txt
+                    _taskInfo.FileName = "WinScp\winscp.exe"
+                    _taskInfo.Arguments = "/log=ftp.log /script=script.txt"
+                    _taskInfo.WindowStyle = ProcessWindowStyle.Hidden
+                    _ds = Process.Start(_taskInfo)
+                    'wait for end process
+                    While Not _ds.HasExited
+                    End While
+                    Dim a As String = _ds.ExitCode
+                    '
+                Catch ex As System.Exception
+                    Me.WriteLog(ex.Message & " - Export file via ftp")
+                    wRunning = False
+                End Try
+                '
+                'Sposta files
+                '
+                Dim _folder As String = "Xml\" & _site.seq.TrimEnd("\")
+                Dim _Movefolder As String = "Xml\" & _site.seq.TrimEnd("\") & "\esportati"
+                Dim di As New DirectoryInfo(_folder)
+                Dim fi As FileInfo
+                Me.WriteLog("Move all files " & " - MoveFtpFiles")
+
+                Try
+                    If Not System.IO.Directory.Exists(_Movefolder) Then
+                        System.IO.Directory.CreateDirectory(_Movefolder)
+                    End If
+                    '
+                    For Each fi In di.GetFiles()
+                        Try
+                            If IO.File.Exists(_Movefolder.TrimEnd & "\" & fi.Name) Then
+                                IO.File.Delete(_Movefolder.TrimEnd & "\" & fi.Name)
+                            End If
+                            IO.File.Move(_folder.TrimEnd & "\" & fi.Name, _Movefolder.TrimEnd & "\" & fi.Name)
+                        Catch ex As Exception
+
+                        End Try
+                    Next
+                Catch ex As System.IO.IOException
+                    Me.WriteLog(ex.Message & " - MoveFtpFiles")
+                Catch ex As SystemException
+                    Me.WriteLog(ex.Message & " - MoveFtpFiles")
+                    Return False
+                Finally
+                    di = Nothing
+                    fi = Nothing
+                End Try
+                '
+            Next
+            Me.WriteLog("Dump articoli completato!" & " - ExportArticoliFull")
+            Application.Exit()
+        Catch ex As Exception
+            Me.WriteLog(ex.Message & " - ExportContrattiFull")
+            Application.Exit()
+        End Try
+    End Function
     Private Function ExportListiniFull() As Boolean
         Try
 
@@ -1195,8 +1387,8 @@ Public Class frmAdhocSync
                     '                         "exit" & Constants.vbCrLf
                     'Questa sintassi mi trasferisce solo il contenuto della cartella e non delle sotto cartelle
                     '
-                    Dim lMessage As String = "open ftp://" & _site.user & ":" & _site.password & "@" & _site.host & " -timeout=240" & Constants.vbCrLf & _
-                                             "put -filemask=""*.sql|*/"" " & "xml/" & _site.seq.TrimEnd("\") & "\*.sql" & Constants.vbCrLf & _
+                    Dim lMessage As String = "open ftp://" & _site.user & ":" & _site.password & "@" & _site.host & " -timeout=240" & Constants.vbCrLf &
+                                             "put -filemask=""*.sql|*/"" " & "xml/" & _site.seq.TrimEnd("\") & "\*.sql" & Constants.vbCrLf &
                                              "exit" & Constants.vbCrLf
                     lByteMess = System.Text.Encoding.ASCII.GetBytes(lMessage)
                     hScriptFile.Write(lByteMess, 0, lMessage.Length)
@@ -1275,6 +1467,7 @@ Public Class frmAdhocSync
             Application.Exit()
         End Try
     End Function
+
     Private Function ExportContrattiFull() As Boolean
         Try
 
@@ -1818,7 +2011,7 @@ Public Class frmAdhocSync
                 Dim _codice As String = _element.Split("#").Clone(1).ToString.Trim
                 'Filters Tables
                 If gTableFilter.Count > 0 Then
-                    If Not gTableFilter.Contains(_table) Then
+                    If gTableFilter.Contains(_table) Then
                         Continue For
                     End If
                 End If
@@ -1844,6 +2037,12 @@ Public Class frmAdhocSync
                 Else
                     _manifest = _Container(_table)
                 End If
+                For Each _query As sQuery In gQuery
+                    If _query.Tabella = _table Then
+                        _manifest.queryString = op.getQuery(g_AdhocAzi, _query.Query)
+                    End If
+                Next
+
                 Select Case _keys.operation
                     Case "UPDATE"
                         If _manifest.mappingTable <> "" Then
@@ -1910,7 +2109,9 @@ Public Class frmAdhocSync
             End If
             '
             If Me.chkAll.Checked = False And Globale.gExpOrdStatus = "S" Then
-                Me.expOrdStatus(filewriter)
+                If Not gTableFilter.Contains("STATORD") Then
+                    Me.expOrdStatus(filewriter)
+                End If
             End If
             '
             stringa = "</dataroot>" & Chr(13) & Chr(10)
@@ -2544,6 +2745,11 @@ Public Class frmAdhocSync
             '
             Dim stringa As String = ""
             _queryString = _queryString & _criteriaString
+            For Each element As sCriterio In gCriteri
+                If element.Tabella.Trim = ptablename.Trim Then
+                    _queryString = _queryString & " AND " & element.Filtro
+                End If
+            Next
             Dim dsArt As DataSet = op.esegui_query(_queryString)
             For Each _row As DataRow In dsArt.Tables(0).Rows
                 '

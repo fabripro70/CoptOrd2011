@@ -12,6 +12,8 @@ Public Class frmFilter
         Dim desc As String
         Dim type As String
         Dim indexSite As String
+        Dim Tabella As String
+        Dim Query As String
     End Structure
     Dim gFilter As New sFilter
     Dim gIndex As Integer = 0
@@ -78,21 +80,25 @@ Public Class frmFilter
                      For Each element As XmlNode In nodo.ChildNodes
                         Dim name As String = element.Name
                         Dim value As String = element.InnerText
-                        Select Case name.ToLower
-                            Case "index"
-                                gFilter.Inde = value
-                            Case "site"
-                                gFilter.site = value
-                            Case "indexsite"
-                                gFilter.indexSite = value
-                            Case "item"
-                                gFilter.item = value
-                            Case "description"
-                                gFilter.desc = value
-                            Case "type"
-                                gFilter.type = value
-                        End Select
-                    Next
+                    Select Case name.ToLower
+                        Case "index"
+                            gFilter.Inde = value
+                        Case "site"
+                            gFilter.site = value
+                        Case "indexsite"
+                            gFilter.indexSite = value
+                        Case "item"
+                            gFilter.item = value
+                        Case "description"
+                            gFilter.desc = value
+                        Case "type"
+                            gFilter.type = value
+                        Case "tabella"
+                            gFilter.Tabella = value
+                        Case "query"
+                            gFilter.Query = value
+                    End Select
+                Next
                     gItems.Add(gFilter.Inde, gFilter)
                     gKeyItems.Add(gFilter.Inde)
             Next
@@ -126,6 +132,8 @@ Public Class frmFilter
                             itemGrid.Item("Codice", _ii).Value = .item
                             itemGrid.Item("Descrizione", _ii).Value = .desc
                             itemGrid.Item("Tipo", _ii).Value = .type
+                            itemGrid.Item("Tabella", _ii).Value = .Tabella
+                            itemGrid.Item("Query", _ii).Value = .Query
                         End With
                         _ii += 1
                     End If
@@ -152,6 +160,8 @@ Public Class frmFilter
                     .site = Me.lbSito.Text.Trim
                     .indexSite = Me.TxtIndexSite.Text.Trim
                     .type = Me.cmbTipo.Text.Trim
+                    .Tabella = Me.txTabella.Text.Trim
+                    .Query = Me.txQuery.Text.Trim
                 End With
                 gItems(Me.txtIndex.Text.Trim) = gFilter
             Else
@@ -163,6 +173,8 @@ Public Class frmFilter
                     .site = Me.lbSito.Text.Trim
                     .indexSite = Me.TxtIndexSite.Text.Trim
                     .type = Me.cmbTipo.Text.Trim
+                    .Tabella = Me.txTabella.Text.Trim
+                    .Query = Me.txQuery.Text.Trim
                 End With
                 gItems.Add(gIndex.ToString.Trim, gFilter)
                 gKeyItems.Add(gIndex.ToString.Trim)
@@ -216,12 +228,14 @@ Public Class frmFilter
                         filewriter.Write(stringa)
                         filewriter.Flush()
                         '
-                        stringa = Chr(9) & Chr(9) & "<index>" & .Inde & "</index>" & Chr(13) & Chr(10) & _
-                                  Chr(9) & Chr(9) & "<site>" & .site & "</site>" & Chr(13) & Chr(10) & _
-                                  Chr(9) & Chr(9) & "<indexsite>" & .indexSite & "</indexsite>" & Chr(13) & Chr(10) & _
-                                  Chr(9) & Chr(9) & "<item>" & .item & "</item>" & Chr(13) & Chr(10) & _
-                                  Chr(9) & Chr(9) & "<description>" & .desc & "</description>" & Chr(13) & Chr(10) & _
-                                  Chr(9) & Chr(9) & "<type>" & .type & "</type>" & Chr(13) & Chr(10)
+                        stringa = Chr(9) & Chr(9) & "<index>" & .Inde & "</index>" & Chr(13) & Chr(10) &
+                                  Chr(9) & Chr(9) & "<site>" & .site & "</site>" & Chr(13) & Chr(10) &
+                                  Chr(9) & Chr(9) & "<indexsite>" & .indexSite & "</indexsite>" & Chr(13) & Chr(10) &
+                                  Chr(9) & Chr(9) & "<item>" & .item & "</item>" & Chr(13) & Chr(10) &
+                                  Chr(9) & Chr(9) & "<description>" & .desc & "</description>" & Chr(13) & Chr(10) &
+                                  Chr(9) & Chr(9) & "<type>" & .type & "</type>" & Chr(13) & Chr(10) &
+                                  Chr(9) & Chr(9) & "<tabella>" & .Tabella & "</tabella>" & Chr(13) & Chr(10) &
+                                  Chr(9) & Chr(9) & "<query>" & .Query & "</query>" & Chr(13) & Chr(10)
                         filewriter.Write(stringa)
                         filewriter.Flush()
                         '
@@ -247,12 +261,12 @@ Public Class frmFilter
     Private Function deleteItem()
 
         Try
-            If Me.txtCodice.Text.Trim <> "" Then
-                If gItems.ContainsKey(Me.txtIndex.Text) Then
-                    gItems.Remove(Me.txtIndex.Text)
-                    gKeyItems.Remove(Me.txtIndex.Text)
-                End If
+            If gItems.ContainsKey(Me.txtIndex.Text) Then
+                gItems.Remove(Me.txtIndex.Text)
+                gKeyItems.Remove(Me.txtIndex.Text)
             End If
+            'If Me.txtCodice.Text.Trim <> "" Then
+            'End If
             Me.loadGrid()
             bGridchanged = True
             cleanFields()
@@ -323,9 +337,19 @@ Public Class frmFilter
             Me.txtIndex.Text = itemGrid.Rows.Item(itemGrid.SelectedCells.Item(0).RowIndex).Cells("Index").Value
             Me.txtCodice.Text = itemGrid.Rows.Item(itemGrid.SelectedCells.Item(0).RowIndex).Cells("Codice").Value
             Me.txtDescrizione.Text = itemGrid.Rows.Item(itemGrid.SelectedCells.Item(0).RowIndex).Cells("Descrizione").Value
+            Me.txTabella.Text = itemGrid.Rows.Item(itemGrid.SelectedCells.Item(0).RowIndex).Cells("Tabella").Value
+            Me.txQuery.Text = itemGrid.Rows.Item(itemGrid.SelectedCells.Item(0).RowIndex).Cells("Query").Value
         Catch ex As System.Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical, "itemgridClickIn")
         End Try
+
+    End Sub
+
+    Private Sub cmbTipo_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbTipo.SelectedIndexChanged
+
+    End Sub
+
+    Private Sub Label6_Click(sender As Object, e As EventArgs) Handles Label6.Click
 
     End Sub
 End Class
