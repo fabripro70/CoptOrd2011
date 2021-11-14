@@ -309,9 +309,6 @@ Public Class frmAdhocSync
         If My.Application.CommandLineArgs.Count > 0 Then
             Dim a As String = My.Application.CommandLineArgs.Item(0)
             Select Case a.ToUpper
-                Case "DUMPARTICOLIORREA"
-                    _g_auto = True
-                    ExportArticoliOrreaFull()
                 Case "DUMPVENDUTO"
                     _g_auto = True
                     ExportVendutoMensile()
@@ -1325,6 +1322,7 @@ Public Class frmAdhocSync
                 Me.WriteLog("Inizio dump listini" & " - ExportListiniFull")
 
                 _site = gSiteList(element)
+                getItemToFilter(_site)
 
 
                 Dim sw As System.IO.FileStream
@@ -1342,7 +1340,15 @@ Public Class frmAdhocSync
                 Dim filewriter As New System.IO.StreamWriter(sw)
 
                 Dim sqlQuery As String = op.getQuery(Globale.CodAzi, "listini.vqr")
-                sqlQuery += " AND LIS_TINI.LICODLIS <> '2' AND LIS_TINI.LICODLIS <> 'ONLI' ORDER BY LIS_TINI.LICODART, LIS_TINI.LICODLIS"
+
+                For Each _query As sQuery In gQuery
+                    If _query.Tabella = "LISTINI" Then
+                        sqlQuery = op.getQuery(g_AdhocAzi, _query.Query)
+                    End If
+                Next
+
+                'La query sotto l'ho commentata perchè il filtro l' ho scritto dentro il file listini.vqr
+                'sqlQuery += " AND LIS_TINI.LICODLIS <> '2' AND LIS_TINI.LICODLIS <> 'ONLI' ORDER BY LIS_TINI.LICODART, LIS_TINI.LICODLIS"
                 Dim ds As DataSet = op.esegui_query(sqlQuery)
                 For Each row As DataRow In ds.Tables(0).Rows
 
