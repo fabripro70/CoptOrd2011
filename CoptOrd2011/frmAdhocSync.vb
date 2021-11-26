@@ -2010,6 +2010,10 @@ Public Class frmAdhocSync
             End If
             '
             For Each _element As String In _aOrd
+                If _element.Trim = "ARTICOLI#CO00077" Then
+                    Dim a As String = "1"
+                End If
+
                 Me.txtRiga.Text = _element
                 Me.txtRiga.Refresh()
                 Dim _table As String = _element.Split("#").Clone(0).ToString.Trim
@@ -2411,7 +2415,7 @@ Public Class frmAdhocSync
                     For Each _row As DataRow In ds.Tables(0).Rows
                         '
                         _key = _hashTable(element).ToString.Trim & "#" & _row(0)
-                        If _key.Contains("CO06179") Then
+                        If _key.Contains("CO00077") Then
                             Dim a As String = "1"
                         End If
                         '
