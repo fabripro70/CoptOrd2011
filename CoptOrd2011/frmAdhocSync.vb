@@ -1720,7 +1720,7 @@ Public Class frmAdhocSync
                 Dim filewriter As New System.IO.StreamWriter(sw)
 
                 Dim sqlQuery As String = op.getQuery(Globale.CodAzi, "listini.vqr")
-                sqlQuery += " AND LIS_TINI.LICODLIS <> '2' AND LIS_TINI.LICODLIS <> 'ONLI' ORDER BY LIS_TINI.LICODART, LIS_TINI.LICODLIS"
+                'sqlQuery += " AND LIS_TINI.LICODLIS <> '2' AND LIS_TINI.LICODLIS <> 'ONLI' ORDER BY LIS_TINI.LICODART, LIS_TINI.LICODLIS"
                 Dim ds As DataSet = op.esegui_query(sqlQuery)
                 For Each row As DataRow In ds.Tables(0).Rows
 
