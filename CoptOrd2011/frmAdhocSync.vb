@@ -450,10 +450,14 @@ Public Class frmAdhocSync
                 Me.txtRiga.Text = "Operazione terminata!"
                 Me.txtRiga.Refresh()
             End If
-            Me.Sendmail("Sincronizzazione shop.copt.it terminata con successo!", gBodyMail)
+            If g_emailTo.Trim <> "" Then
+                Me.Sendmail("Sincronizzazione shop.copt.it terminata con successo!", gBodyMail)
+            End If
         Catch ex As System.Exception
             Me.WriteLog(ex.Message)
-            Me.Sendmail("Sincronizzazione shop.copt.it terminata con anomalie!", gBodyMail)
+            If g_emailTo.Trim <> "" Then
+                Me.Sendmail("Sincronizzazione shop.copt.it terminata con anomalie!", gBodyMail)
+            End If
         End Try
 
     End Function
@@ -2754,12 +2758,14 @@ Public Class frmAdhocSync
             End If
             '
             Dim stringa As String = ""
+            'Applica filtro
             _queryString = _queryString & _criteriaString
             For Each element As sCriterio In gCriteri
                 If element.Tabella.Trim = ptablename.Trim Then
                     _queryString = _queryString & " AND " & element.Filtro
                 End If
             Next
+            'Fine applica filtro
             Dim dsArt As DataSet = op.esegui_query(_queryString)
             For Each _row As DataRow In dsArt.Tables(0).Rows
                 '
