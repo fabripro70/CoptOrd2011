@@ -1887,6 +1887,64 @@ Public Class frmAdhocSync
                 '
                 filewriter.Close()
                 '
+                fileexp = _updFold & "\\exparticoli.sql"
+                '
+                sw = New System.IO.FileStream(fileexp, IO.FileMode.Create)
+                filewriter = New System.IO.StreamWriter(sw)
+
+                sqlQuery = op.getQuery(Globale.CodAzi, "articoli.vqr")
+                ds = op.esegui_query(sqlQuery)
+                For Each row As DataRow In ds.Tables(0).Rows
+
+                    Dim deleteQuery_1 As String = "delete from PALMARTICOLI where arcodart = '" & row("arcodart").ToString.Trim & "';" & Chr(13) & Chr(10)
+                    filewriter.Write(deleteQuery_1)
+                    filewriter.Flush()
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ARCODART", op.ValAdapter(row("ARCODART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARDESART", op.ValAdapter(row("ARDESART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARUNIMIS", op.ValAdapter(row("ARUNMIS1").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARMOLTIP", op.ValAdapter(row("ARMOLTIP").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("AROPERAT", op.ValAdapter(row("AROPERAT").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARUNMIS2", op.ValAdapter(row("ARUNMIS2").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARGRUMER", op.ValAdapter(row("ARGRUMER").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARDTOBSO", op.ValAdapter(row("ARDTOBSO").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("ARLOTVEN", op.ValAdapter(row("ARLOTVEN").ToString.Trim, TipoCampo.TInt))
+                    adhoc.hFieldVal.Add("AR___IMG", op.ValAdapter(row("AR___IMG").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARDESSUP", op.ValAdapter(row("ARDESSUP").ToString.Trim, TipoCampo.TChar))
+                    Dim resultQuery As String = op.CreateInsertQuery("PALMARTICOLI", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                Next
+                filewriter.Close()
+                '
+                fileexp = _updFold & "\\expkeyarti.sql"
+                '
+                sw = New System.IO.FileStream(fileexp, IO.FileMode.Create)
+                filewriter = New System.IO.StreamWriter(sw)
+
+                sqlQuery = op.getQuery(Globale.CodAzi, "key_arti.vqr")
+                ds = op.esegui_query(sqlQuery)
+                For Each row As DataRow In ds.Tables(0).Rows
+
+                    Dim deleteQuery_1 As String = "delete from PALMKEYARTI where cacodice = '" & row("cacodice").ToString.Trim & "';" & Chr(13) & Chr(10)
+                    filewriter.Write(deleteQuery_1)
+                    filewriter.Flush()
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("CACODICE", op.ValAdapter(row("CACODICE").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CADESART", op.ValAdapter(row("CADESART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CACODART", op.ValAdapter(row("CACODART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CAUNIMIS", op.ValAdapter(row("CAUNIMIS").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CAMOLTIP", op.ValAdapter(row("CAMOLTIP").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("CAOPERAT", op.ValAdapter(row("CAOPERAT").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CADTOBSO", op.ValAdapter(row("CADTOBSO").ToString.Trim, TipoCampo.TData))
+                    Dim resultQuery As String = op.CreateInsertQuery("PALMKEYARTI", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                Next
+                filewriter.Close()
+
+
+                '
                 'Export ftp
                 '
                 Me.WriteLog("Export file via ftp" & " - ExportListiniFull")
@@ -1954,6 +2012,267 @@ Public Class frmAdhocSync
             Application.Exit()
         End Try
     End Function
+
+    Private Function ExportArticoliFullAgenti() As Boolean
+        Try
+
+            Dim _site As New sSite
+
+            gKsiteList.Sort()
+            For Each element As String In gKsiteList
+
+
+                Me.WriteLog("Inizio dump Articoli" & " - ExportArticoliFullAgenti")
+
+                _site = gSiteList(element)
+
+
+                Dim sw As System.IO.FileStream
+
+                Dim _updFold As String = "Articoliagenti"
+
+                If Not Directory.Exists(_updFold) Then
+                    Directory.CreateDirectory(_updFold)
+                End If
+                '
+                Dim testCodart As String = ""
+                Dim fileexp As String = _updFold & "\\exparticoli.sql"
+                '
+                sw = New System.IO.FileStream(fileexp, IO.FileMode.Create)
+                Dim filewriter As New System.IO.StreamWriter(sw)
+
+                Dim sqlQuery As String = op.getQuery(Globale.CodAzi, "articoli.vqr")
+                'sqlQuery += " AND LIS_TINI.LICODLIS <> '2' AND LIS_TINI.LICODLIS <> 'ONLI' ORDER BY LIS_TINI.LICODART, LIS_TINI.LICODLIS"
+                Dim ds As DataSet = op.esegui_query(sqlQuery)
+                For Each row As DataRow In ds.Tables(0).Rows
+
+                    If testCodart.Trim <> row("ARCODART").ToString.Trim Then
+
+                        Dim deleteQuery_1 As String = "delete from PALMARTICOLI where arcodart = '" & row("arcodart").ToString.Trim & "';" & Chr(13) & Chr(10)
+                        filewriter.Write(deleteQuery_1)
+                        filewriter.Flush()
+                        '
+                        testCodart = row("ARCODART").ToString.Trim
+                    End If
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("ARCODART", op.ValAdapter(row("ARCODART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARDESART", op.ValAdapter(row("ARDESART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARUNMIS1", op.ValAdapter(row("ARUNIMIS").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("ARMOLTIP", op.ValAdapter(row("ARMOLTIP").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("AROPERAT", op.ValAdapter(row("AROPERAT").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("ARUNMIS2", op.ValAdapter(row("ARUNMIS2").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("ARGRUMER", op.ValAdapter(row("ARGRUMER").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("ARDTOBSO", op.ValAdapter(row("ARDTOBSO").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("ARLOTVEN", op.ValAdapter(row("ARLOTVEN").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("AR___IMG", op.ValAdapter(row("AR___IMG").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("ARDESSUP", op.ValAdapter(row("ARDESSUP").ToString.Trim, TipoCampo.TCur))
+                    Dim resultQuery As String = op.CreateInsertQuery("PALMARTICOLI", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                Next
+                filewriter.Close()
+                '
+                'Prepara script
+                '
+                Me.WriteLog("Preparazione script WinScp" & " - ExportArticoliFull")
+                '
+                Dim hScriptFile As New FileStream("script.txt", FileMode.Create)
+                Try
+                    'hScriptFile = File.Open("script.txt", FileMode.Append)
+                    Dim lByteMess As Byte()
+                    '
+
+                    'Dim lMessage As String = "open ftp://" & pUser & ":" & pPasswd & "@" & pHost & " -timeout=240" & Constants.vbCrLf & _
+                    '                         "put " & "xml/" & pLocalPath.TrimEnd("\") & "\*.*" & Constants.vbCrLf & _
+                    '                         "exit" & Constants.vbCrLf
+                    'Questa sintassi mi trasferisce solo il contenuto della cartella e non delle sotto cartelle
+                    '
+                    'Dim lMessage As String = "open ftp://808coptag:xawe6188r" & "@" & _site.host & " -timeout=240" & Constants.vbCrLf & _
+                    '                         "put -filemask=""*.sql|*/"" " & "listini" & "\*.sql" & Constants.vbCrLf & _
+                    '                         "exit" & Constants.vbCrLf
+                    '
+                    Dim lMessage As String = "open ftp://808coptag:xawe6188r" & "@" & "ftp.copt.it" & " -timeout=240" & Constants.vbCrLf &
+                                             "put -filemask=""*.sql|*/"" " & "listiniagenti" & "\*.sql www/listini/" & Constants.vbCrLf &
+                                             "exit" & Constants.vbCrLf
+                    '
+                    lByteMess = System.Text.Encoding.ASCII.GetBytes(lMessage)
+                    hScriptFile.Write(lByteMess, 0, lMessage.Length)
+                    '
+                Catch ex As Exception
+                    Me.WriteLog(ex.Message & " - ExportArticoliFull")
+                Finally
+                    hScriptFile.Close()
+                    hScriptFile = Nothing
+                End Try
+                '
+
+                fileexp = _updFold & "\\expcontratti.sql"
+                '
+                sw = New System.IO.FileStream(fileexp, IO.FileMode.Create)
+                filewriter = New System.IO.StreamWriter(sw)
+                '
+                'Con_tram
+                '
+                '
+                Dim deleteQuery As String = "delete from PALMCON_TRAM;" & Chr(13) & Chr(10)
+                filewriter.Write(deleteQuery)
+                filewriter.Flush()
+                '
+                sqlQuery = op.getQuery(Globale.CodAzi, "con_tram.vqr")
+                sqlQuery += " AND CON_TRAM.CODATFIN >= getdate()"
+
+                ds = op.esegui_query(sqlQuery)
+                For Each row As DataRow In ds.Tables(0).Rows
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("CONUMERO", op.ValAdapter(row("CONUMERO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CODATCON", op.ValAdapter(row("CODATCON").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("COTIPCLF", op.ValAdapter(row("COTIPCLF").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("COCODCLF", op.ValAdapter(row("COCODCLF").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("COCATCOM", op.ValAdapter(row("COCATCOM").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CODESCON", op.ValAdapter(row("CODESCON").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CODATINI", op.ValAdapter(row("CODATINI").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("CODATFIN", op.ValAdapter(row("CODATFIN").ToString.Trim, TipoCampo.TData))
+                    adhoc.hFieldVal.Add("COCODVAL", op.ValAdapter(row("COCODVAL").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("COIVALIS", op.ValAdapter(row("COIVALIS").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("COFLAQTA", op.ValAdapter(row("COFLAQTA").ToString.Trim, TipoCampo.TChar))
+                    Dim resultQuery As String = op.CreateInsertQuery("PALMCON_TRAM", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                Next
+                '
+                'Con_tram
+                '
+                '
+                deleteQuery = "delete from PALMCON_TRAD;" & Chr(13) & Chr(10)
+                filewriter.Write(deleteQuery)
+                filewriter.Flush()
+                '
+                sqlQuery = op.getQuery(Globale.CodAzi, "con_trad.vqr")
+                sqlQuery += " AND CON_TRAM.CODATFIN >= getdate()"
+
+                ds = op.esegui_query(sqlQuery)
+                For Each row As DataRow In ds.Tables(0).Rows
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("CONUMERO", op.ValAdapter(row("CONUMERO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CPROWNUM", op.ValAdapter(row("CPROWNUM").ToString.Trim, TipoCampo.TInt))
+                    adhoc.hFieldVal.Add("COGRUMER", op.ValAdapter(row("COGRUMER").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("COCODART", op.ValAdapter(row("COCODART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("COPREZZO", op.ValAdapter(row("COPREZZO").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COSCONT1", op.ValAdapter(row("COSCONT1").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COSCONT2", op.ValAdapter(row("COSCONT2").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COSCONT3", op.ValAdapter(row("COSCONT3").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COSCONT4", op.ValAdapter(row("COSCONT4").ToString.Trim, TipoCampo.TCur))
+                    Dim resultQuery As String = op.CreateInsertQuery("PALMCON_TRAD", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                Next
+                '
+                'Cont_sca
+                '
+                '
+                deleteQuery = "delete from PALMCON_COSC;" & Chr(13) & Chr(10)
+                filewriter.Write(deleteQuery)
+                filewriter.Flush()
+                '
+                sqlQuery = op.getQuery(Globale.CodAzi, "con_cosc.vqr")
+                sqlQuery += " AND CON_TRAM.CODATFIN >= getdate()"
+
+                ds = op.esegui_query(sqlQuery)
+                For Each row As DataRow In ds.Tables(0).Rows
+                    '
+                    adhoc.hFieldVal.Clear()
+                    adhoc.hFieldVal.Add("CONUMERO", op.ValAdapter(row("CONUMERO").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("CPROWNUM", op.ValAdapter(row("CPROWNUM").ToString.Trim, TipoCampo.TInt))
+                    adhoc.hFieldVal.Add("COGRUMER", op.ValAdapter(row("COGRUMER").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("COCODART", op.ValAdapter(row("COCODART").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("COQUANTI", op.ValAdapter(row("COQUANTI").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COPREZZO", op.ValAdapter(row("COPREZZO").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COSCONT1", op.ValAdapter(row("COSCONT1").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COSCONT2", op.ValAdapter(row("COSCONT2").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COSCONT3", op.ValAdapter(row("COSCONT3").ToString.Trim, TipoCampo.TCur))
+                    adhoc.hFieldVal.Add("COSCONT4", op.ValAdapter(row("COSCONT4").ToString.Trim, TipoCampo.TCur))
+                    Dim resultQuery As String = op.CreateInsertQuery("PALMCON_COSC", adhoc.hFieldVal, cn, "")
+                    filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
+                    filewriter.Flush()
+                    '
+                Next
+                '
+                '
+                '
+                filewriter.Close()
+                '
+                'Export ftp
+                '
+                Me.WriteLog("Export file via ftp" & " - ExportListiniFull")
+                '
+                Try
+                    '
+                    Me.WriteLog("Upload files " & " - CallWinScp")
+                    '
+                    Dim _taskInfo As New ProcessStartInfo
+                    Dim _ds As New Diagnostics.Process
+                    '
+                    'WinScp\winscp.exe /log=ftp.log /script=script.txt
+                    _taskInfo.FileName = "WinScp\winscp.exe"
+                    _taskInfo.Arguments = "/log=ftp.log /script=script.txt"
+                    _taskInfo.WindowStyle = ProcessWindowStyle.Hidden
+                    _ds = Process.Start(_taskInfo)
+                    'wait for end process
+                    While Not _ds.HasExited
+                    End While
+                    Dim a As String = _ds.ExitCode
+                    '
+                Catch ex As System.Exception
+                    Me.WriteLog(ex.Message & " - Export file via ftp")
+                    wRunning = False
+                End Try
+                '
+                'Sposta files
+                '
+                Dim _folder As String = "listiniagenti"
+                Dim _Movefolder As String = "listiniagenti\" & _site.seq.TrimEnd("\") & "\esportati"
+                Dim di As New DirectoryInfo(_folder)
+                Dim fi As FileInfo
+                Me.WriteLog("Move all files " & " - MoveFtpFiles")
+
+                Try
+                    If Not System.IO.Directory.Exists(_Movefolder) Then
+                        System.IO.Directory.CreateDirectory(_Movefolder)
+                    End If
+                    '
+                    For Each fi In di.GetFiles()
+                        Try
+                            If IO.File.Exists(_Movefolder.TrimEnd & "\" & fi.Name) Then
+                                IO.File.Delete(_Movefolder.TrimEnd & "\" & fi.Name)
+                            End If
+                            IO.File.Move(_folder.TrimEnd & "\" & fi.Name, _Movefolder.TrimEnd & "\" & fi.Name)
+                        Catch ex As Exception
+
+                        End Try
+                    Next
+                Catch ex As System.IO.IOException
+                    Me.WriteLog(ex.Message & " - MoveFtpFiles")
+                Catch ex As SystemException
+                    Me.WriteLog(ex.Message & " - MoveFtpFiles")
+                    Return False
+                Finally
+                    di = Nothing
+                    fi = Nothing
+                End Try
+                '
+            Next
+            Me.WriteLog("Dump listini Agenti completato!" & " - ExportListiniFull")
+            Application.Exit()
+        Catch ex As Exception
+            Me.WriteLog(ex.Message & " - ExportListiniFull")
+            Application.Exit()
+        End Try
+    End Function
+
 
     Private Function fExport(ByVal phost As String, ByVal pfolder As String, ByVal puser As String, ByVal ppassword As String, ByRef _aOrd As ArrayList, ByRef _hTemp As Hashtable, ByVal pSeq As String) As Integer
         Try
@@ -2740,7 +3059,7 @@ Public Class frmAdhocSync
             Dim _propValue As String = ""
             Dim _logstring As String = ""
             '
-            If ptablename = "CATEGOA" Then
+            If ptablename = "ARTICOLI" Then
                 Dim a As Integer = "1"
             End If
             Dim _queryString As String = pquerystring.ToUpper
@@ -6397,12 +6716,21 @@ Public Class frmAdhocSync
     End Sub
     Private Function xmlEnc(ByVal pstring As String) As String
         Try
+
             Dim sOutput As String = pstring
+            'Dim sOutput As String = pstring.Replace("&", "&amp")
+            'sOutput = sOutput.Replace("""", "&quot")
+            'sOutput = sOutput.Replace("'", "&apos")
+            'sOutput = sOutput.Replace("<", "&lt")
+            'sOutput = sOutput.Replace(">", "&gt")
+            '
             If gUTF8 = "S" Then
-                Return codifica(sOutput)
+                'Return codifica(sOutput)
+                Return htmlEncode(sOutput)
             Else
                 Return sOutput
             End If
+
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Exclamation, "xmlEnc")
         End Try
@@ -6418,7 +6746,8 @@ Public Class frmAdhocSync
         Dim Testo As String = pStringa
         Dim lStringa As String = ""
         Try
-
+            Testo = Testo.Replace("&", "&amp;")
+            Testo = Testo.Replace("'", "&apos;")
             Testo = Testo.Replace("""", "&quot;")
             Testo = Testo.Replace("<", "&lt;")
             Testo = Testo.Replace(">", "&gt;")
@@ -6541,7 +6870,7 @@ Public Class frmAdhocSync
             Testo = Testo.Replace("›", "&rsaquo;")
             Testo = Testo.Replace("€", "&euro;")
             Testo = Testo.Replace("™", "&trade;")
-            Testo = Testo.Replace("&", "&amp;")
+
         Catch ex As Exception
             MsgBox(ex.Message)
         Finally
