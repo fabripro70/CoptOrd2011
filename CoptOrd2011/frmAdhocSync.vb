@@ -2062,7 +2062,7 @@ Public Class frmAdhocSync
                     filewriter.Flush()
                     adhoc.hFieldVal.Clear()
                     adhoc.hFieldVal.Add("SACODART", op.ValAdapter(row("SLCODICE").ToString.Trim, TipoCampo.TChar))
-                    adhoc.hFieldVal.Add("SALDIART", op.ValAdapter(row("SLQTAPER").ToString.Trim, TipoCampo.TChar))
+                    adhoc.hFieldVal.Add("SALDIART", op.ValAdapter(row("SLQTAPER").ToString.Trim, TipoCampo.TCur))
                     Dim resultQuery As String = op.CreateInsertQuery("PALMSALDIART", adhoc.hFieldVal, cn, "")
                     filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
                     filewriter.Flush()
