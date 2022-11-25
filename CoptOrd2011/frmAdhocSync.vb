@@ -6265,7 +6265,7 @@ Public Class frmAdhocSync
             Dim _despriv As New sDesPriv
             '
             For Each element As String In gDes.Keys ' Here i'm doing a loop but it's not ncessary because there is only one other destination for each order.
-                adhoc.hFieldVal.Clear()
+                'adhoc.hFieldVal.Clear()
                 Dim ppar As New sDesdive
                 '
                 ppar = gDes(element)
@@ -6329,6 +6329,8 @@ Public Class frmAdhocSync
 
                 Else
                 End If
+                adhoc.hFieldVal.Clear()
+                '
                 adhoc.hFieldVal.Add("DDTIPCON", op.ValAdapter("C", TipoCampo.TChar))
                 adhoc.hFieldVal.Add("DDCODICE", op.ValAdapter(_Codcli, TipoCampo.TChar))
                 adhoc.hFieldVal.Add("DDCODDES", op.ValAdapter(_Coddes, TipoCampo.TChar))

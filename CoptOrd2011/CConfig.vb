@@ -88,26 +88,62 @@ Public Class CConfig
                 Application.Exit()
             End Try
             '
-            elm = secPropSet.Settings.Get("emailTo")
-            g_emailTo = elm.Value.ValueXml.InnerText
-            elm = secPropSet.Settings.Get("emailCC")
-            g_emailCC = elm.Value.ValueXml.InnerText
+            Try
+                elm = secPropSet.Settings.Get("emailTo")
+                g_emailTo = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_emailTo = ""
+            End Try
+            Try
+                elm = secPropSet.Settings.Get("emailCC")
+                g_emailCC = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_emailCC = ""
+            End Try
             '
-            elm = secPropSet.Settings.Get("Mittente")
-            g_Mittente = elm.Value.ValueXml.InnerText
-            elm = secPropSet.Settings.Get("SMTP")
-            g_SMTP = elm.Value.ValueXml.InnerText
-            elm = secPropSet.Settings.Get("Auth")
-            g_Auth = elm.Value.ValueXml.InnerText
-            elm = secPropSet.Settings.Get("Ssl")
-            g_Ssl = elm.Value.ValueXml.InnerText
-            elm = secPropSet.Settings.Get("Utente")
-            g_Utente = elm.Value.ValueXml.InnerText
-            elm = secPropSet.Settings.Get("Password")
-            g_Password = elm.Value.ValueXml.InnerText
+            Try
+                elm = secPropSet.Settings.Get("Mittente")
+                g_Mittente = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_Mittente = ""
+            End Try
+            Try
+                elm = secPropSet.Settings.Get("SMTP")
+                g_SMTP = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_SMTP = ""
+            End Try
+            Try
+                elm = secPropSet.Settings.Get("Auth")
+                g_Auth = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_Auth = ""
+            End Try
+            Try
+                elm = secPropSet.Settings.Get("Ssl")
+                g_Ssl = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_Ssl = ""
+            End Try
+            Try
+                elm = secPropSet.Settings.Get("Utente")
+                g_Utente = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_Utente = ""
+            End Try
+            Try
+                elm = secPropSet.Settings.Get("Password")
+                g_Password = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_Password = ""
+            End Try
             '
-            elm = secPropSet.Settings.Get("SmtpPort")
-            g_Port = elm.Value.ValueXml.InnerText
+            Try
+                elm = secPropSet.Settings.Get("SmtpPort")
+                g_Port = elm.Value.ValueXml.InnerText
+            Catch ex As Exception
+                g_Port = ""
+            End Try
             '
             Try
                 elm = secPropSet.Settings.Get("CatCom")
