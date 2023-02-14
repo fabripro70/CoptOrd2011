@@ -347,7 +347,7 @@ Public Class CAdhocDoc
                 If element = pTable Then
                     Dim a As String = ""
                 End If
-                If element = "MVCODDES" Then
+                If element = "MVORSHOP" Then
                     Dim a As String = "1"
                 End If
                 _fieldType = CType(Me.hPlantable(pTable & "." & element), s_planField).fieldType
