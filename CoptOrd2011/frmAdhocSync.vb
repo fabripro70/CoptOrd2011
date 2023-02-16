@@ -313,6 +313,9 @@ Public Class frmAdhocSync
                 Case "DUMPVENDUTOSTO"
                     _g_auto = True
                     ExportVendutoMensileStorico()
+                Case "DUMPVENDUTO"
+                    _g_auto = True
+                    ExportVendutoMensile()
                 Case "DUMPVENDUTOWEB"
                     _g_auto = True
                     ExportVendutoMensileShop()
