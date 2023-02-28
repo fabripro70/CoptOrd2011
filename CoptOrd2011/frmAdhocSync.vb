@@ -1795,7 +1795,18 @@ Public Class frmAdhocSync
                 '
                 Dim sqlQuery As String = op.getQuery(Globale.CodAzi, "con_tram.vqr")
                 sqlQuery += " AND CON_TRAM.CODATFIN >= getdate()"
-
+                sqlQuery += " UNION ALL Select " +
+                            "CON_TRAM.CONUMERO, " +
+                            "CON_TRAM.CODATCON, " +
+                            "CON_TRAM.COTIPCLF, " +
+                            "CON_TRAM.COCODCLF, " +
+                            "CON_TRAM.COCATCOM, " +
+                            "CON_TRAM.CODESCON, " +
+                            "CON_TRAM.CODATINI, " +
+                            "CON_TRAM.CODATFIN, " +
+                            "CON_TRAM.COCODVAL, " +
+                            "CON_TRAM.COIVALIS, " +
+                            "CON_TRAM.COQUANTI AS COFLAQTA From " + Globale.CodAzi + "CON_TRAM CON_TRAM Where CONUMERO = 'CONTRATTO WEB'"
                 Dim ds As DataSet = op.esegui_query(sqlQuery)
                 For Each row As DataRow In ds.Tables(0).Rows
                     '
@@ -1825,8 +1836,20 @@ Public Class frmAdhocSync
                 filewriter.Flush()
                 '
                 sqlQuery = op.getQuery(Globale.CodAzi, "con_trad.vqr")
-                sqlQuery += " AND CON_TRAM.CODATFIN >= getdate()"
-
+                sqlQuery += " AND CON_TRAM.CODATFIN >= getdate() UNION ALL " +
+                    "Select CON_TRAM.CONUMERO, " +
+                    "      CON_TRAD.CPROWNUM, " +
+                    "      CON_TRAD.COGRUMER, " +
+                    "      CON_TRAD.COCODART, " +
+                    "      CON_TRAD.COPREZZO, " +
+                    "      CON_TRAD.COSCONT1, " +
+                    "      CON_TRAD.COSCONT2, " +
+                    "      CON_TRAD.COSCONT3, " +
+                    "      CON_TRAD.COSCONT4 " +
+                    "    From " +
+                    Globale.CodAzi + "CON_TRAD CON_TRAD Inner Join " +
+                    Globale.CodAzi + "CON_TRAM CON_TRAM On CON_TRAM.CONUMERO = CON_TRAD.CONUMERO " +
+                    "    WHERE CON_TRAM.CONUMERO = 'CONTRATTO WEB' "
                 ds = op.esegui_query(sqlQuery)
                 For Each row As DataRow In ds.Tables(0).Rows
                     '
@@ -1854,8 +1877,25 @@ Public Class frmAdhocSync
                 filewriter.Flush()
                 '
                 sqlQuery = op.getQuery(Globale.CodAzi, "con_cosc.vqr")
-                sqlQuery += " AND CON_TRAM.CODATFIN >= getdate()"
-
+                sqlQuery += " AND CON_TRAM.CODATFIN >= getdate() UNION ALL " +
+                    "Select CON_TRAM.CONUMERO, " +
+                    "  CON_TRAD.CPROWNUM, " +
+                    "  CON_TRAD.COGRUMER, " +
+                    "  CON_TRAD.COCODART, " +
+                    "  CON_COSC.COQUANTI, " +
+                    "  CON_COSC.COPREZZO, " +
+                    "  CON_COSC.COSCONT1, " +
+                    "  CON_COSC.COSCONT2, " +
+                    "  CON_COSC.COSCONT3, " +
+                    "  CON_COSC.COSCONT4 " +
+                    "From " +
+                    Globale.CodAzi + "CON_TRAM CON_TRAM Inner Join " +
+                    Globale.CodAzi + "CON_TRAD CON_TRAD On CON_TRAM.CONUMERO = CON_TRAD.CONUMERO Inner Join " +
+                    Globale.CodAzi + "CON_COSC CON_COSC On CON_TRAD.CONUMERO = CON_COSC.COCODICE And " +
+                    "CON_TRAD.CPROWNUM = CON_COSC.CONUMROW " +
+                    "Where " +
+                    "CON_TRAM.COQUANTI = 'S' AND " +
+                    "CON_TRAM.CONUMERO = 'CONTRATTO WEB'"
                 ds = op.esegui_query(sqlQuery)
                 For Each row As DataRow In ds.Tables(0).Rows
                     '
