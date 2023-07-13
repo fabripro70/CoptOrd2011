@@ -148,9 +148,9 @@ Public Class CAdhocDoc
             For Each nodo As XmlNode In XmlNodo
                 For Each element As XmlNode In nodo.ChildNodes
                     Dim name As String = element.Name
-                    'If name = "MVCODCLA" Then
-                    'Dim a As Integer = 0
-                    'End If
+                    If name = "MVORSHOP" Then
+                        Dim a As Integer = 0
+                    End If
                     Dim value As String = element.InnerText
                     hashName.Add(name, value)
                 Next
