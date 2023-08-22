@@ -429,6 +429,7 @@ Public Class frmAdhocSync
                 getItemToFilter(_site)
                 '
                 With _site
+                    hImages.Clear()
                     Me.fExport(.host, .folder, .user, .password, _aOrd, _hTemp, _site.seq)
                     If chkNoftp.Checked = False Then
                         Me.httpPost(.httppost)
@@ -2638,71 +2639,74 @@ Public Class frmAdhocSync
             sw.Close()
             '
             wStep = 1
-            Do
-                Select Case wStep
-                    Case 1
-                        '
-                        If wRunning Then Continue Do
-                        '
-                        Me.txtRiga.Text = ""
-                        Me.txtRiga.Refresh()
-                        Me.lb_grandezza.Text = ""
-                        Me.lb_grandezza.Refresh()
-                        Me.lb_progress.Text = ""
-                        Me.lb_progress.Refresh()
-                        Me.lbAzione.Text = ""
-                        Me.lbAzione.Refresh()
-                        '
-                        'Send file by ftp
-                        'pFolder is the remote host folder name
-                        'Source directory is in pSeq variable
-                        '
-                        If chkNoftp.Checked = False Then
-                            'crea script per il lnacio di WinScp
-                            Dim _st As Boolean = ftpExport(phost, pfolder, puser, ppassword, pSeq)
-                            If Not _st Then
-                                Me.WriteLog("Previous task has genarated errors - exit")
-                                wStep = 10
+            If 1 = 1 Then   '22-08-2023 Questa serve solo per Debug, per escludere l' invio ftp
+                Do
+                    Select Case wStep
+                        Case 1
+                            '
+                            If wRunning Then Continue Do
+                            '
+                            Me.txtRiga.Text = ""
+                            Me.txtRiga.Refresh()
+                            Me.lb_grandezza.Text = ""
+                            Me.lb_grandezza.Refresh()
+                            Me.lb_progress.Text = ""
+                            Me.lb_progress.Refresh()
+                            Me.lbAzione.Text = ""
+                            Me.lbAzione.Refresh()
+                            '
+                            'Send file by ftp
+                            'pFolder is the remote host folder name
+                            'Source directory is in pSeq variable
+                            '
+                            If chkNoftp.Checked = False Then
+                                'crea script per il lnacio di WinScp
+                                Dim _st As Boolean = ftpExport(phost, pfolder, puser, ppassword, pSeq)
+                                If Not _st Then
+                                    Me.WriteLog("Previous task has genarated errors - exit")
+                                    wStep = 10
+                                End If
+                            Else
+                                wStep += 1
                             End If
-                        Else
-                            wStep += 1
-                        End If
                         '
-                    Case 2
-                        '
-                        If wRunning Then Continue Do
-                        '
-                        If chkNoftp.Checked = False Then
-                            Dim _st As Boolean = CallWinScp(pfolder)
-                            If Not _st Then
-                                Me.WriteLog("Previous task has genarated errors - exit")
-                                wStep = 10
+                        Case 2
+                            '
+                            If wRunning Then Continue Do
+                            '
+                            If chkNoftp.Checked = False Then
+                                Dim _st As Boolean = CallWinScp(pfolder)
+                                If Not _st Then
+                                    Me.WriteLog("Previous task has genarated errors - exit")
+                                    wStep = 10
+                                End If
+                            Else
+                                wStep += 1
                             End If
-                        Else
-                            wStep += 1
-                        End If
-                    Case 3
-                        '
-                        If wRunning Then Continue Do
-                        '
-                        If Not chkMantxml.Checked Then
-                            'Dim _st As Boolean = DeleteFiles(pSeq)
-                            Dim _st As Boolean = MoveFtpFiles(pSeq)
-                            If Not _st Then
-                                Me.WriteLog("Previous task has genarated errors - exit")
-                                wStep = 10
+                        Case 3
+                            '
+                            If wRunning Then Continue Do
+                            '
+                            If Not chkMantxml.Checked Then
+                                'Dim _st As Boolean = DeleteFiles(pSeq)
+                                Dim _st As Boolean = MoveFtpFiles(pSeq)
+                                If Not _st Then
+                                    Me.WriteLog("Previous task has genarated errors - exit")
+                                    wStep = 10
+                                End If
+                            Else
+                                wStep += 1
                             End If
-                        Else
-                            wStep += 1
-                        End If
-                    Case 10
-                        Exit Do
-                    Case Else
-                        If wStep <> 0 Then
-                            wStep += 1
-                        End If
-                End Select
-            Loop
+                        Case 10
+                            Exit Do
+                        Case Else
+                            If wStep <> 0 Then
+                                wStep += 1
+                            End If
+                    End Select
+                Loop
+            End If
+
             '
             _g_end = True
             Return 1
@@ -2910,12 +2914,14 @@ Public Class frmAdhocSync
             Dim _manifest As New sManifest
             Dim _hashTable As New Hashtable
             Dim _column As New DataColumn
+            'Legge tutte le tabelle da codazi\UpdateManifest.xml  
             _hashTable = Me.ReadManifestTables
 
             For Each element As String In _hashTable.Keys
                 _manifest = Me.readManifest(_hashTable(element))
                 Me.txtRiga.Text = "Reading... " & _manifest.mappingTable.Trim
                 Me.txtRiga.Refresh()
+                'Legge la query nel file codazi\UpdateManifest.xml 
                 _query = _manifest.queryAll
                 Dim ds As DataSet = op.esegui_query(_manifest.queryAll)
                 If ds.Tables(0).Rows.Count > 0 Then
@@ -3321,7 +3327,11 @@ Public Class frmAdhocSync
                                     iIndex += 1
                                 Next
                                 If rString.Trim() <> "" Then
-                                    hImages.Add(_row.Item(pManifest.hFields("ARCODART")).ToString.Trim(), rString.TrimEnd(";"))
+                                    'Metto in try perchè se si sbagliano ed inseriscono lo stesso codice + volte ne accetta uno solo
+                                    Try
+                                        hImages.Add(_row.Item(pManifest.hFields("ARCODART")).ToString.Trim(), rString.TrimEnd(";"))
+                                    Catch ex As Exception
+                                    End Try
                                 End If
                             End If
                             _rowValue = _rowValue.ToString.Trim.Split(";")(0)
