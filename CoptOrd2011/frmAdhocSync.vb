@@ -3332,6 +3332,12 @@ Public Class frmAdhocSync
                                         hImages.Add(_row.Item(pManifest.hFields("ARCODART")).ToString.Trim(), rString.TrimEnd(";"))
                                     Catch ex As Exception
                                     End Try
+                                Else
+                                    'Metto in try perchè se si sbagliano ed inseriscono lo stesso codice + volte ne accetta uno solo
+                                    Try
+                                        hImages.Add(_row.Item(pManifest.hFields("ARCODART")).ToString.Trim(), "")
+                                    Catch ex As Exception
+                                    End Try
                                 End If
                             End If
                             _rowValue = _rowValue.ToString.Trim.Split(";")(0)

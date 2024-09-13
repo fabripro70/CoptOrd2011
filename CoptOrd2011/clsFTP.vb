@@ -141,7 +141,7 @@ Public Class clsFTP
         'Send an FTP command,
         SendCommand("NLST " & sMask)
 
-        If (Not (m_iRetValue = 150 Or m_iRetValue = 125)) Then
+        If (Not (m_iRetValue = 150 Or m_iRetValue = 125 Or m_iRetValue = 226)) Then
             MessageString = m_sReply
             Throw New IOException(m_sReply.Substring(4))
         End If
