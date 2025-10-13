@@ -3292,7 +3292,7 @@ Public Class COpeFile
         Dim da As New SqlClient.SqlDataAdapter
         cmd.CommandText = pStoredProcedure
         cmd.Connection = pCn
-        cmd.CommandTimeout = 120
+        cmd.CommandTimeout = 240
         cmd.CommandType = CommandType.StoredProcedure
         'cmd.Parameters.Add(New SqlParameter("@OE", YourValue)
         da.SelectCommand = cmd

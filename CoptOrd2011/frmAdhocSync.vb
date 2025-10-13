@@ -625,7 +625,7 @@ Public Class frmAdhocSync
             For Each element As String In gKsiteList
 
 
-                Me.WriteLog("Inizio dump listini" & " - ExportVendutoMensile")
+                Me.WriteLog("Inizio dump venduto" & " - ExportVendutoMensile")
 
                 _site = gSiteList(element)
 
@@ -900,7 +900,7 @@ Public Class frmAdhocSync
             For Each element As String In gKsiteList
 
 
-                Me.WriteLog("Inizio dump listini" & " - ExportVendutoMensileShop")
+                Me.WriteLog("Inizio dump venduto shop" & " - ExportVendutoMensileShop")
 
                 _site = gSiteList(element)
 
@@ -925,7 +925,11 @@ Public Class frmAdhocSync
                 Dim MeseStr As String = Mese.ToString.PadLeft(2, "0")
                 'Dim MeseStr As String = "01"
 
+                'Eseguire questa query
+                'SELECT FBCLIENTE,FBDESCLI,GEN,FEB,MAR,APR,MAG,GIU,LUG,AGO,SETT,OTT,NOV,DIC,ANNO FROM COPTGFATTMENS WHERE ANNO = @ANNO
+
                 Dim ds As DataSet = op.esegui_sp("sp_legge_vendite_web_adhoc", cn)
+                Me.WriteLog("Eseguita stored procedure " & " - sp_legge_vendite_web_adhoc")
 
                 If ds.Tables(0).Rows.Count > 0 Then
                     Dim Anno As String = ds.Tables(0).Rows(0).Item("ANNO").ToString.Trim
@@ -933,7 +937,7 @@ Public Class frmAdhocSync
                     filewriter.Write(resultQuery & ";" & Chr(13) & Chr(10))
                     filewriter.Flush()
                 End If
-
+                Me.WriteLog("Inizio creazione file")
                 For Each row As DataRow In ds.Tables(0).Rows
 
                     '
@@ -1067,6 +1071,7 @@ Public Class frmAdhocSync
                     '
                 Next
                 filewriter.Close()
+                Me.WriteLog("Fine creazione file")
                 '
                 'Prepara script
                 '
@@ -2636,6 +2641,7 @@ Public Class frmAdhocSync
             filewriter.Write(stringa)
             filewriter.Flush()
             '
+            filewriter.Close()
             sw.Close()
             '
             wStep = 1
@@ -7426,6 +7432,7 @@ Public Class frmAdhocSync
 
             Do
                 sLine = objReader.ReadLine()
+
                 Me.cmbSitecheck.Items.Add(sLine.Trim)
             Loop Until sLine Is Nothing
             objReader.Close()
@@ -7562,6 +7569,10 @@ Public Class frmAdhocSync
     End Function
 
     Private Sub chkAll_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkAll.CheckedChanged
+
+    End Sub
+
+    Private Sub chkMantieni_CheckedChanged(sender As Object, e As EventArgs) Handles chkMantieni.CheckedChanged
 
     End Sub
 End Class
